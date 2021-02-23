@@ -68,3 +68,7 @@ template<typename dtype> dtype** Utils::newArray2D(int n, int m) {
     }
     return arr;
 }
+
+template<typename value> value readNPY(string path) {
+    
+}
