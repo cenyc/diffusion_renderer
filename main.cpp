@@ -3,8 +3,6 @@
 #include "Shape.h"
 #include "Camera.h"
 #include "Scene.h"
-using namespace enoki;
-using namespace std;
 
 using FloatC = CUDAArray<float>;
 using FloatD = DiffArray<FloatC>;

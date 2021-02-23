@@ -7,11 +7,13 @@ void Scene::rendering() {
         auto imgBuffColumn = (*imgBuff)[i];
         for (size_t j = 0; j < imgBuffColumn.size(); j++)
         {
-            // auto ray = this->cam.getRay(i, j);
-            // this->shape.intersect();
+            auto ray = this->cam.getRay(i, j);
+            float dirTMax = __FLT_MIN__,
+            dirTMin = __FLT_MAX__;
+            
         }
     }
     auto ray = this->cam.getRay(0, 0);
-    this->shape.intersect(ray);
-    this->shape.getVer(1);
+    this->shape.intersect(ray, 1);
+    // this->shape.getVer(1);
 }
