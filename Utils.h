@@ -27,7 +27,7 @@ struct Utils {
      * 
      * @tparam value 
      * @param path 文件路径
-     * @return value 返回的读取数据，若是id0为64*64*96大小的数组，若是id1为id0为64*64*96*3大小的数组
+     * @return value 返回的读取数据，若是id0为64*64*96大小的数组，若是id1为64*64*96*3大小的数组
      */
     template <typename value>static value readNPY(string path);
 
