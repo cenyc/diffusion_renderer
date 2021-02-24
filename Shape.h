@@ -17,6 +17,19 @@ template <typename Ver, typename Tri> struct Shape
     Ver ver;
     Tri tri;
 
+    /**
+     * @brief 对shape的顶点进行平移变换
+     * 
+     * @param tran （tran[0], tran[1], tran[2]）分别对应x, y, z轴的偏移量
+     */
+    void translate(DR::Vertor3f tran);
+
+    /**
+     * @brief 对shape的顶点进行尺度的变换
+     * 
+     * @param scale_ （scale_[0], scale_[1], scale_[2]）分别对应x, y, z轴方向缩放的尺度
+     */
+    void scale(DR::Vertor3f scale_);
 
     /**
      * @brief 根据光线和三角形的id索引计算该三角形与光线是否相交
@@ -48,6 +61,19 @@ template <typename Ver, typename Tri> struct Shape
     ENOKI_STRUCT(Shape, verNum, faceNum, ver, tri)
 };
 ENOKI_STRUCT_SUPPORT(Shape, verNum, faceNum, ver, tri)
+
+template<typename Ver, typename Tri>
+void Shape<Ver, Tri>::translate(DR::Vertor3f tran) {
+    this->ver += tran;
+}
+
+template<typename Ver, typename Tri>
+void Shape<Ver, Tri>::scale(DR::Vertor3f scale_) {
+    DR::Matrix3f scaleTransform(scale_[0], 0.0f, 0.0f,
+                                0.0f, scale_[1], 0.0f,
+                                0.0f, 0.0f, scale_[2]);
+    this->ver = scaleTransform*this->ver;
+}
 
 template<typename Ver, typename Tri>
 DR::ID3 Shape<Ver, Tri>::getTriIDs(size_t faceID) {

@@ -4,11 +4,13 @@
 #include <fstream>
 #include <sstream>
 #include <malloc.h>
+#include <omp.h>
 #include <enoki/array.h>
 #include <enoki/cuda.h>
 #include <enoki/autodiff.h>
 #include <enoki/special.h>
 #include <enoki/dynamic.h>
+#include <enoki/matrix.h>
 using namespace enoki;
 using namespace std;
 
@@ -19,6 +21,7 @@ static constexpr int HEIGHT = 512;
 
 using FloatC = CUDAArray<float>;
 using Vector3fC = Packet<FloatC, 3>;
+using Vertor3f = Array<float, 3>;
 using Float = Array<float>;
 using FloatP = Packet<float>;
 using SizeP = Packet<size_t>;
@@ -29,6 +32,8 @@ using Vector3P3X = DynamicArray<Vector3P3>;
 using FloatX = DynamicArray<FloatP>;
 using SizeX = DynamicArray<SizeP>;
 using VectorWfC = Array<FloatC, 512>;
+
+using Matrix3f  = enoki::Matrix<float, 3>;
 
 using ID3 = Array<size_t, 3>;
 using Edge = Point;
