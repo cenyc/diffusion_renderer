@@ -33,3 +33,7 @@ void Scene::rendering() {
     // this->shape.intersect(ray, 1);
     // this->shape.getVer(1);
 }
+
+void Scene::saveImg() {
+    
+}

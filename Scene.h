@@ -21,6 +21,7 @@ struct Scene
     }
 
     void rendering();
+    void saveImg();
     ~Scene() {
         Utils::msg("free scene's buff.");
         free(this->rayBuff);
