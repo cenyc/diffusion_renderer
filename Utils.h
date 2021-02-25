@@ -29,7 +29,8 @@ struct Utils {
      * @param path 文件路径
      * @return value 返回的读取数据，若是id0为64*64*96大小的数组，若是id1为64*64*96*3大小的数组
      */
-    template <typename value>static value readNPY(string path);
+    static bool readId0(string path, float Id0[DR::ID_WIDTH][DR::ID_HEIGHT][DR::ID_WIDTH]);
+    static bool readId1(string path, DR::Point Id1[DR::ID_WIDTH][DR::ID_HEIGHT][DR::ID_WIDTH]);
 
     /**
      * @brief 动态创建二维数组

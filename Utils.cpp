@@ -69,6 +69,54 @@ template<typename dtype> dtype** Utils::newArray2D(int n, int m) {
     return arr;
 }
 
-template<typename value> value readNPY(string path) {
+bool Utils::readId0(string path, float Id0[DR::ID_WIDTH][DR::ID_HEIGHT][DR::ID_WIDTH]) {
+    Utils::msg("Start reading Id0 file.");
     
+    ifstream infile;
+    float item;
+    infile.open(path, ios::in);
+    if (!infile.is_open()){
+        Utils::msg("Unable to open file.", true);
+        return false;
+    }
+    
+    // 开始读取
+    for(int i = 0;i < DR::ID_WIDTH; i++){
+        for(int j = 0; j < DR::ID_HEIGHT; j++){
+            for(int k = 0; k < DR::ID_WIDTH; k++){
+                infile>>item;
+                Id0[i][j][k] = item;
+            }
+        }
+    }
+    infile.close();
+    Utils::msg("Finished reading Id0 file.");
+    
+    return true;
+}
+
+bool Utils::readId1(string path, DR::Point Id1[DR::ID_WIDTH][DR::ID_HEIGHT][DR::ID_WIDTH]) {
+    Utils::msg("Start reading Id1 file.");
+    
+    ifstream infile;
+    float a,b,c;
+    infile.open(path, ios::in);
+    if (!infile.is_open()){
+        Utils::msg("Unable to open file.", true);
+        return false;
+    }
+    
+    // 开始读取
+    for(int i = 0;i < DR::ID_WIDTH; i++){
+        for(int j = 0; j < DR::ID_HEIGHT; j++){
+            for(int k = 0; k < DR::ID_WIDTH; k++){
+                infile>>a>>b>>c;
+                Id1[i][j][k] = DR::Point(a, b, c);;
+            }
+        }
+    }
+    infile.close();
+    Utils::msg("Finished reading Id1 file.");
+    
+    return true;
 }
