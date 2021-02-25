@@ -19,6 +19,9 @@ NAMESPACE_BEGIN(DR)
 static constexpr int WIDTH = 512;
 static constexpr int HEIGHT = 512;
 
+static const int ID_WIDTH = 64;
+static const int ID_HEIGHT = 96;
+
 using FloatC = CUDAArray<float>;
 using Vector3fC = Packet<FloatC, 3>;
 using Vertor3f = Array<float, 3>;

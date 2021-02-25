@@ -38,6 +38,19 @@ void test() {
 
     //     cout << "result = " << aa << endl;  
     // }
+    /*
+    读取Id0和Id1:
+    if(Utils::readId0("./data/id0.txt", Id0)){
+        cout<<Id0[0][0][0]<<endl;
+        cout<<Id0[0][0][1]<<endl;
+        cout<<Id0[DR::ID_WIDTH - 1][DR::ID_HEIGHT - 1][DR::ID_WIDTH - 1]<<endl;
+    }
+    if(Utils::readId1("./data/id1.txt", Id1)){
+        cout<<Id1[0][0][0]<<endl;
+        cout<<Id1[0][0][1]<<endl;
+        cout<<Id1[DR::ID_WIDTH - 1][DR::ID_HEIGHT - 1][DR::ID_WIDTH - 1]<<endl;
+    }
+    */
 }
 
 int main(int argc,char *argv[]){    
