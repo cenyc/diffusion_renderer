@@ -61,6 +61,7 @@ template <typename Ver, typename Tri> struct Shape
     DR::ID3 getTriIDs(size_t faceID);
 
     ~Shape() {
+        cout << "Free Shape space." << endl;
         free(this->id0);
         free(this->id1);
     }

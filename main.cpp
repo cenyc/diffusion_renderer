@@ -52,15 +52,12 @@ int main(int argc,char *argv[]){
     Shape<DR::F3X, DR::S3X> shape;
     Utils::readOFF("../data/cube.off", shape);
 
-    // Shape<DR::F3X, DR::S3X> shape1;
-    // cout << shape.tri << endl;
-    // = Utils::readOFF("../data/cube.off");
-    // Camera cam;
-    // Scene scene(shape, cam);
+    Camera cam;
+    Scene scene(cam, &shape);
     // 对物体进行尺度和平移变换
-    // scene.shape.scale(DR::Vertor3f(0.6, 0.9, 0.6));
-    // scene.shape.translate(DR::Vertor3f(-0.25, -0.25, -2));
-    // scene.rendering();
+    scene.shape->scale(DR::Vertor3f(0.6, 0.9, 0.6));
+    scene.shape->translate(DR::Vertor3f(-0.25, -0.25, -2));
+    scene.rendering();
     
     // cout << a1[a2] << endl;
 
