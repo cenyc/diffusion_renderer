@@ -36,25 +36,25 @@ void Scene::rendering() {
     // this->shape.getVer(1);
 }
 
-void Scene::saveGrayImg(string filename, int * rgbData, int weight, int height) {
-    unsigned char rgb[weight * height * 3], *p = rgb;
+void Scene::saveGrayImg(string filename) {
+    unsigned char rgb[DR::WIDTH * DR::HEIGHT * 3], *p = rgb;
     unsigned x, y;
     int colorValue = 0;
-
+    
     FILE *fp = fopen(filename.c_str(), "wb");
-    for (y = 0; y < weight; y++)
-        for (x = 0; x < height; x++) {
+    for (y = 0; y < DR::WIDTH; y++)
+        for (x = 0; x < DR::HEIGHT; x++) {
             colorValue = 0;
-            if ( rgbData[y * weight + x] >= 0 && rgbData[y * weight + x] < 256 ) // 判断色值范围
+            if ((this->imgBuff[0][y][x] >= 0) && (this->imgBuff[0][y][x] < 256)) // 判断色值范围
             {
-                colorValue = rgbData[y * weight + x];
+                colorValue = (int)this->imgBuff[0][y][x] + 100;
             }
             
-            *p++ = (unsigned char)colorValue;    /* R */
-            *p++ = (unsigned char)colorValue;    /* G */
-            *p++ = (unsigned char)colorValue;    /* B */
+            *p++ = (unsigned char)colorValue;    // R
+            *p++ = (unsigned char)colorValue;    // G
+            *p++ = (unsigned char)colorValue;    // B
         }
-    svpng(fp, weight, height, rgb, 0);
+    svpng(fp, DR::WIDTH, DR::HEIGHT, rgb, 0);
     fclose(fp);
     Utils::msg("Finished Save Gray Img.");
 }

@@ -52,15 +52,9 @@ void test() {
     }
     */
    /*
-   保存png图片 注* 每像素值需0~255
+    保存png图片 注* 每像素值需0~255之间
     string fileName = "rgb.png";
-    int rgbData[256][256];
-    for (int i = 0; i < 256; i++){
-        for (int j = 0; j < 256; j++){
-            rgbData[i][j] = rand() % 256;
-        }
-    }
-    scene.saveGrayImg(fileName, (int *)rgbData, 256, 256);
+    scene.saveGrayImg(fileName);
     */
 }
 
