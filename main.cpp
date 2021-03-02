@@ -52,6 +52,7 @@ int main(int argc,char *argv[]){
     scene.shape->scale(DR::Vertor3f(0.6, 0.9, 0.6));
     scene.shape->translate(DR::Vertor3f(-0.25, -0.25, -2));
     scene.rendering();
+    scene.saveGrayImg("../data/gray.png");
     
     // cout << a1[a2] << endl;
 
