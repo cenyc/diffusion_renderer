@@ -21,7 +21,7 @@ struct Scene
     }
 
     void rendering();
-    void saveImg();
+    void saveGrayImg(string filename, int * rgbData, int weight, int height);
     ~Scene() {
         Utils::msg("free scene's buff.");
         free(this->rayBuff);
