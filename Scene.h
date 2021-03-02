@@ -21,13 +21,7 @@ struct Scene
     }
 
     void rendering();
-
-    /**
-     * @brief 存储渲染图像为png格式
-     * 
-     */
-    void saveImg();
-    
+    void saveGrayImg(string filename, int * rgbData, int weight, int height);
     ~Scene() {
         Utils::msg("free scene's buff.");
         free(this->rayBuff);

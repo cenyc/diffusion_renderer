@@ -17,6 +17,34 @@ template <typename Value> Value srgb_gamma(Value x) {
 
 void test() {
 
+    //     auto aa = gather<Float10C>(result.data(), pair.first, pair.second);
+
+    //     cout << "result = " << aa << endl;  
+    // }
+    /*
+    读取Id0和Id1:
+    if(Utils::readId0("./data/id0.txt", Id0)){
+        cout<<Id0[0][0][0]<<endl;
+        cout<<Id0[0][0][1]<<endl;
+        cout<<Id0[DR::ID_WIDTH - 1][DR::ID_HEIGHT - 1][DR::ID_WIDTH - 1]<<endl;
+    }
+    if(Utils::readId1("./data/id1.txt", Id1)){
+        cout<<Id1[0][0][0]<<endl;
+        cout<<Id1[0][0][1]<<endl;
+        cout<<Id1[DR::ID_WIDTH - 1][DR::ID_HEIGHT - 1][DR::ID_WIDTH - 1]<<endl;
+    }
+    */
+   /*
+   保存png图片 注* 每像素值需0~255
+    string fileName = "rgb.png";
+    int rgbData[256][256];
+    for (int i = 0; i < 256; i++){
+        for (int j = 0; j < 256; j++){
+            rgbData[i][j] = rand() % 256;
+        }
+    }
+    scene.saveGrayImg(fileName, (int *)rgbData, 256, 256);
+    */
 }
 
 int main(int argc,char *argv[]){    
