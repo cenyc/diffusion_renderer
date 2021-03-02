@@ -45,9 +45,9 @@ void Scene::saveGrayImg(string filename) {
     for (y = 0; y < DR::WIDTH; y++)
         for (x = 0; x < DR::HEIGHT; x++) {
             colorValue = 0;
-            if ((this->imgBuff[0][y][x] >= 0) && (this->imgBuff[0][y][x] < 256)) // 判断色值范围
+            if (((*this->imgBuff)[y][x] >= 0) && ((*this->imgBuff)[y][x] < 256)) // 判断色值范围
             {
-                colorValue = (int)this->imgBuff[0][y][x];
+                colorValue = (int)(*this->imgBuff)[y][x];
             }
             
             *p++ = (unsigned char)colorValue;    // R
