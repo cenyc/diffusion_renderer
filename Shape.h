@@ -2,7 +2,7 @@
 #define __SHAPE_H__
 #include "common.h"
 #include "Ray.h"
-
+// #include "Utils.h"
 struct HitTriangle {
     bool isHit = true;
     float dirT;
@@ -16,6 +16,8 @@ template <typename Ver, typename Tri> struct Shape
     int faceNum;
     Ver ver;
     Tri tri;
+    DR::ID0 *id0 = (DR::ID0*) malloc(sizeof(zero<DR::ID0>()));
+    DR::ID1 *id1 = (DR::ID1*) malloc(sizeof(zero<DR::ID1>()));
 
     /**
      * @brief 对shape的顶点进行平移变换
@@ -57,6 +59,11 @@ template <typename Ver, typename Tri> struct Shape
      * @return DR::ID3 
      */
     DR::ID3 getTriIDs(size_t faceID);
+
+    ~Shape() {
+        free(this->id0);
+        free(this->id1);
+    }
 
     ENOKI_STRUCT(Shape, verNum, faceNum, ver, tri)
 };

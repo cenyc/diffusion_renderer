@@ -1,6 +1,6 @@
 #include "Utils.h"
 int msgCount = 1;
-Shape<DR::F3X, DR::S3X> Utils::readOFF(string path) {
+void Utils::readOFF(string path, Shape<DR::F3X, DR::S3X>& shape) {
     Utils::msg("Start reading off file.");
     ifstream infile;
     char buffer[256];
@@ -41,11 +41,17 @@ Shape<DR::F3X, DR::S3X> Utils::readOFF(string path) {
         ++count;
     }
     infile.close();
-    Shape<DR::F3X, DR::F3X> shape(verNum, triNum, verBuff, triBuff);
+    shape.verNum = verNum;
+    shape.faceNum = triNum;
+    shape.ver = verBuff;
+    shape.tri = triBuff;
+    readId0("../data/id0.txt", *shape.id0);
+    readId1("../data/id1.txt", *shape.id1);
+
     ostringstream ost;
     ost << "Finished reading off file, the verNum is " << verNum << ", triNum is " << triNum << ".";
     Utils::msg(ost.str());
-    return shape;
+
 }
 
 
@@ -69,7 +75,7 @@ template<typename dtype> dtype** Utils::newArray2D(int n, int m) {
     return arr;
 }
 
-bool Utils::readId0(string path, float Id0[DR::ID_WIDTH][DR::ID_HEIGHT][DR::ID_WIDTH]) {
+bool Utils::readId0(string path, DR::ID0 &id0) {
     Utils::msg("Start reading Id0 file.");
     
     ifstream infile;
@@ -85,7 +91,7 @@ bool Utils::readId0(string path, float Id0[DR::ID_WIDTH][DR::ID_HEIGHT][DR::ID_W
         for(int j = 0; j < DR::ID_HEIGHT; j++){
             for(int k = 0; k < DR::ID_WIDTH; k++){
                 infile>>item;
-                Id0[i][j][k] = item;
+                id0[i][j][k] = item;
             }
         }
     }
@@ -95,7 +101,7 @@ bool Utils::readId0(string path, float Id0[DR::ID_WIDTH][DR::ID_HEIGHT][DR::ID_W
     return true;
 }
 
-bool Utils::readId1(string path, DR::Point Id1[DR::ID_WIDTH][DR::ID_HEIGHT][DR::ID_WIDTH]) {
+bool Utils::readId1(string path, DR::ID1 &id1) {
     Utils::msg("Start reading Id1 file.");
     
     ifstream infile;
@@ -111,7 +117,7 @@ bool Utils::readId1(string path, DR::Point Id1[DR::ID_WIDTH][DR::ID_HEIGHT][DR::
         for(int j = 0; j < DR::ID_HEIGHT; j++){
             for(int k = 0; k < DR::ID_WIDTH; k++){
                 infile>>a>>b>>c;
-                Id1[i][j][k] = DR::Point(a, b, c);;
+                id1[i][j][k] = DR::Point(a, b, c);;
             }
         }
     }

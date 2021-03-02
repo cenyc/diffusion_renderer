@@ -12,7 +12,7 @@ struct Scene
     
     DR::ImgBuff *imgBuff = (DR::ImgBuff*) malloc(sizeof(zero<DR::ImgBuff>()));
     DR::RayBuff *rayBuff = (DR::RayBuff*) malloc(sizeof(zero<DR::RayBuff>()));
-
+    
     Scene(Shape<DR::F3X, DR::S3X> shape_, Camera cam_) {
         this->shape = shape_;
         this->cam = cam_;
@@ -21,7 +21,13 @@ struct Scene
     }
 
     void rendering();
+
+    /**
+     * @brief 存储渲染图像为png格式
+     * 
+     */
     void saveImg();
+    
     ~Scene() {
         Utils::msg("free scene's buff.");
         free(this->rayBuff);
