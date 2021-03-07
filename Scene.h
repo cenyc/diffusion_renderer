@@ -7,13 +7,13 @@
 
 struct Scene
 {
-    Shape<DR::F3X, DR::S3X> shape;
+    Shape<DR::F3X, DR::S3X> *shape;
     Camera cam;
     
     DR::ImgBuff *imgBuff = (DR::ImgBuff*) malloc(sizeof(zero<DR::ImgBuff>()));
     DR::RayBuff *rayBuff = (DR::RayBuff*) malloc(sizeof(zero<DR::RayBuff>()));
-
-    Scene(Shape<DR::F3X, DR::S3X> shape_, Camera cam_) {
+    // Scene(Shape<DR::F3X, DR::S3X> shape_, Camera cam_)
+    Scene(Camera cam_, Shape<DR::F3X, DR::S3X> *shape_) {
         this->shape = shape_;
         this->cam = cam_;
         (*this->imgBuff) = zero<DR::ImgBuff>();

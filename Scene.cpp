@@ -16,12 +16,12 @@ void Scene::rendering() {
             float dirTMax = __FLT_MIN__,
             dirTMin = __FLT_MAX__;
             // 遍历所有的面看是否与光线相交
-            for (size_t k = 0; k < this->shape.faceNum; k++)
+            for (size_t k = 0; k < this->shape->faceNum; k++)
             {
-                HitTriangle hitTran = this->shape.intersect(ray, k);
+                HitTriangle hitTran = this->shape->intersect(ray, k);
                 if (hitTran.isHit)
                 {
-                    
+                    (*this->imgBuff)[y][x] = 255;
                 }
                 
             }

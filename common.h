@@ -53,7 +53,8 @@ using S3X = Array<SizeX, 3>;
 using ImgBuff = Array<Packet<float, DR::HEIGHT>, DR::WIDTH>;
 using RayBuff = Array<ImgBuff, 3>;
 
-
+using ID0 = Array<Array<Packet<float, ID_WIDTH>, ID_HEIGHT>, ID_WIDTH>;
+using ID1 = Array<Array<Packet<Point, ID_WIDTH>, ID_HEIGHT>, ID_WIDTH>;
 
 template <typename Value_, size_t Size_>
 struct VectorX : StaticArrayImpl<Value_, Size_, false,

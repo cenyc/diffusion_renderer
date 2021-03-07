@@ -13,7 +13,7 @@ struct Utils {
      * 
      * @param path off文件路径
      */
-    static Shape<DR::F3X, DR::S3X> readOFF(string path);
+    static void readOFF(string path, Shape<DR::F3X, DR::S3X>& shape);
     /**
      * @brief 打印string
      * 
@@ -29,8 +29,8 @@ struct Utils {
      * @param path 文件路径
      * @return value 返回的读取数据，若是id0为64*64*96大小的数组，若是id1为64*64*96*3大小的数组
      */
-    static bool readId0(string path, float Id0[DR::ID_WIDTH][DR::ID_HEIGHT][DR::ID_WIDTH]);
-    static bool readId1(string path, DR::Point Id1[DR::ID_WIDTH][DR::ID_HEIGHT][DR::ID_WIDTH]);
+    static bool readId0(string path, DR::ID0 &id0);
+    static bool readId1(string path, DR::ID1 &id1);
 
     /**
      * @brief 动态创建二维数组

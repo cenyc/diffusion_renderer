@@ -15,24 +15,7 @@ template <typename Value> Value srgb_gamma(Value x) {
     );
 }
 
-
 void test() {
-    // using Index2x10 = Array<DR::Index10, 2>;
-    // using Float10C = Array<float, 7>;
-    // using Mask10C = mask_t<Float10C>;
-    // Float10C result(2.1, 2.2, 2.3, 1.5, 2.3, 7.6, 8.2);
-    // mask_t<Float10C> mask_ = true;
-    // mask_[2] = false;
-    // mask_[3] = false;
-
-    // float f[] = {1, 2, 3, 4, 5, 6, 7};
-    // for (auto pair : range<DR::Index10>(2))
-    // {
-    //     cout << "index = " << endl << pair.first << " mask = " << pair.second << endl;
-    //     constexpr size_t Stride      = sizeof(Float10C);
-    //     using UInt32P   = Packet<uint32_t, 7>;
-    //     UInt32P indices(5, 1, 0, 0, 2, 6, 4);
-
 
     //     auto aa = gather<Float10C>(result.data(), pair.first, pair.second);
 
@@ -60,13 +43,16 @@ void test() {
 
 int main(int argc,char *argv[]){    
     // cuda_set_log_level(3);
-    Shape<DR::F3X, DR::S3X> shape = Utils::readOFF("../data/cube.off");
+    Shape<DR::F3X, DR::S3X> shape;
+    Utils::readOFF("../data/cube.off", shape);
+
     Camera cam;
-    Scene scene(shape, cam);
+    Scene scene(cam, &shape);
     // 对物体进行尺度和平移变换
-    scene.shape.scale(DR::Vertor3f(0.6, 0.9, 0.6));
-    scene.shape.translate(DR::Vertor3f(-0.25, -0.25, -2));
+    scene.shape->scale(DR::Vertor3f(0.6, 0.9, 0.6));
+    scene.shape->translate(DR::Vertor3f(-0.25, -0.25, -2));
     scene.rendering();
+    scene.saveGrayImg("../data/gray.png");
     
     // cout << a1[a2] << endl;
 
