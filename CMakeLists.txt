@@ -26,7 +26,7 @@ add_library(self_define ${SOURCE_FILES})
 add_executable(diffusion_renderer main.cpp)
 
 # target_link_libraries加在add_executable之后
-target_link_libraries(diffusion_renderer -lenoki-cuda -lenoki-autodiff -lcuda)
+target_link_libraries(diffusion_renderer -lenoki-cuda -lenoki-autodiff -lcuda -lcudart)
 target_link_libraries(diffusion_renderer self_define)
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})

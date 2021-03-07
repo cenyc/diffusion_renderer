@@ -1,9 +1,13 @@
 #include "Scene.h"
 #include "include/svpng.inc"
 
+
+
+
 void Scene::rendering() {
     Utils::msg("Start scene rendering.");
     int count = 1;
+    float max_t = 0.0;
     // CPU内核个数（32）
     const int nworker = omp_get_num_procs();
     #pragma omp parallel for num_threads(nworker) schedule(dynamic, 1)
@@ -21,13 +25,27 @@ void Scene::rendering() {
                 HitTriangle hitTran = this->shape->intersect(ray, k);
                 if (hitTran.isHit)
                 {
-                    (*this->imgBuff)[y][x] = 255;
+                    dirTMax = max(dirTMax, hitTran.dirT);
+                    dirTMin = min(dirTMin, hitTran.dirT);
                 }
                 
             }
+
+            // 如果穿过参与介质
+            if (dirTMax - dirTMin > 0.0001)
+            {
+                DR::Point nearPoint = ray.org + ray.dir * dirTMin;
+                DR::Point farPoint = ray.org + ray.dir * dirTMax;
+
+                PtrInteraction nearInter = new Interaction(nearPoint, ray.dir),
+                farInter = new Interaction(farPoint, ray.dir);
+                (*this->imgBuff)[x][y] = rayMarching(nearInter, farInter);
+            //     // cout << nearInter << endl;
+            }
+            
         }
     }
-    
+    // cout << this->shape->orgVer << endl;
     // cout << max(2.3, 5) << endl;
     // cout << dot(bb, cc[0]) << " " << dot(bb, cc[1]) << " " << dot(bb, cc[2]) << endl;
     // cout << dot(cc, bb) << endl;
@@ -35,6 +53,27 @@ void Scene::rendering() {
     // this->shape.intersect(ray, 1);
     // this->shape.getVer(1);
 }
+
+float Scene::rayMarching(PtrInteraction nearPoint, PtrInteraction farPoint) {
+    float intensity = 0.0;
+    float pathLength = norm((farPoint->hitPoint - nearPoint->hitPoint));
+    auto currentPoint = nearPoint->hitPoint;
+    float currentLength = 0.0;
+    while (currentLength <= pathLength)
+    {
+        auto voxelPoint = round(this->shape->world2voxel(&currentPoint));
+        
+        auto id0 = this->shape->getIntensity0(voxelPoint);
+        auto id1 = this->shape->getIntensity1(voxelPoint);
+        intensity += id0 + dot(id1, nearPoint->dir);
+        // 更新位置
+        currentPoint += farPoint->dir*this->shape->step;
+        currentLength += this->shape->step;
+    }
+
+    return intensity;
+}
+
 
 void Scene::saveGrayImg(string filename) {
     unsigned char rgb[DR::WIDTH * DR::HEIGHT * 3], *p = rgb;

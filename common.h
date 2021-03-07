@@ -62,7 +62,7 @@ struct VectorX : StaticArrayImpl<Value_, Size_, false,
 
     /// Base class
     using Base = StaticArrayImpl<Value_, Size_, false,
-                                        VectorX<Value_, Size_>>;
+                                  VectorX<Value_, Size_>>;
 
     /// Helper alias used to implement type promotion rules
     template <typename T> using ReplaceValue = VectorX<T, Size_>;

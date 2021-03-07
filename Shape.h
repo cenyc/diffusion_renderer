@@ -18,6 +18,62 @@ template <typename Ver, typename Tri> struct Shape
     Tri tri;
     DR::ID0 *id0 = (DR::ID0*) malloc(sizeof(zero<DR::ID0>()));
     DR::ID1 *id1 = (DR::ID1*) malloc(sizeof(zero<DR::ID1>()));
+    int orgVerID = 0;
+    int diagonalVID[2] = {0, 6};
+    float step = 0.0;
+    int sampleNum = 25;
+
+    /**
+     * @brief 更新采样步长
+     * 
+     */
+    void updateStepSize();
+
+    /**
+     * @brief 由世界坐标转换到体素坐标
+     * 
+     * @param ptrVer 
+     * @return DR::Point 
+     */
+    DR::Point world2voxel(DR::Point* ptrVer);
+
+    /**
+     * @brief 由世界坐标转换到局部坐标
+     * 
+     * @param ptrVer 
+     * @return DR::Point 
+     */
+    DR::Point world2local(DR::Point* ptrVer);
+
+    /**
+     * @brief 由局部坐标转换到体素坐标
+     * 
+     * @param ptrVer 
+     * @return DR::Point 
+     */
+    DR::Point local2voxel(DR::Point* ptrVer);
+    
+    /**
+     * @brief 获取体素标定原点
+     * 
+     * @return DR::Point 
+     */
+    DR::Point getOrgVer();
+
+    /**
+     * @brief 
+     * minmax[0]-记录x、y、z轴的最小值
+     * minmax[1]-记录x、y、z轴的最大值
+     * minmax[2]-记录x、y、z轴的abs(minmax[1]-minmax[0])
+     * 
+     */
+    DR::Vector3P3 minmax;
+
+    /**
+     * @brief 但顶点位置发生变化时，用来初始化或更新边界范围值。
+     * 
+     */
+    void initMinmax();
 
     /**
      * @brief 对shape的顶点进行平移变换
@@ -66,13 +122,76 @@ template <typename Ver, typename Tri> struct Shape
         free(this->id1);
     }
 
+    /**
+     * @brief 根据体素坐标的位置获取id0的值
+     * 
+     * @param worldCoordinate 
+     * @return float 
+     */
+    float getIntensity0(DR::Point voxelVer);
+
+    /**
+     * @brief 根据体素坐标的位置获取id1的值
+     * 
+     * @param voxelVer 
+     * @return DR::Point 
+     */
+    DR::Point getIntensity1(DR::Point voxelVer);
+
     ENOKI_STRUCT(Shape, verNum, faceNum, ver, tri)
 };
 ENOKI_STRUCT_SUPPORT(Shape, verNum, faceNum, ver, tri)
 
 template<typename Ver, typename Tri>
+void Shape<Ver, Tri>::updateStepSize() {
+    this->step = norm(this->getVer(this->diagonalVID[0]) - this->getVer(this->diagonalVID[1])) / this->sampleNum;
+}
+
+template<typename Ver, typename Tri>
+DR::Point Shape<Ver, Tri>::getIntensity1(DR::Point voxelVer) {
+    return (*this->id1)[voxelVer[0]][voxelVer[1]][voxelVer[2]];
+}
+
+template<typename Ver, typename Tri>
+float Shape<Ver, Tri>::getIntensity0(DR::Point voxelVer) {
+    return (*this->id0)[voxelVer[0]][voxelVer[1]][voxelVer[2]];
+}
+
+template<typename Ver, typename Tri>
+DR::Point Shape<Ver, Tri>::getOrgVer() {
+    return getVer(this->orgVerID);
+}
+
+template<typename Ver, typename Tri>
+void Shape<Ver, Tri>::initMinmax () {
+    for (size_t i = 0; i < 3; i++)
+    {
+        this->minmax[0][i] = hmin(this->ver[i]);
+        this->minmax[1][i] = hmax(this->ver[i]);
+        this->minmax[2][i] = abs(this->minmax[1][i] - this->minmax[0][i]);
+    }
+}
+
+template<typename Ver, typename Tri>
+DR::Point Shape<Ver, Tri>::world2voxel(DR::Point* ptrVer) {
+    auto localVer = world2local(ptrVer);
+    return local2voxel(&localVer);
+}
+
+template<typename Ver, typename Tri>
+DR::Point Shape<Ver, Tri>::local2voxel(DR::Point* ptrVer) {
+    return ((*ptrVer)/minmax[2]) * DR::Point(DR::ID_WIDTH-1, DR::ID_HEIGHT-1, DR::ID_WIDTH-1);
+}
+
+template<typename Ver, typename Tri>
+DR::Point Shape<Ver, Tri>::world2local(DR::Point* ptrVer) {
+    return (*ptrVer) - getOrgVer();
+}
+
+template<typename Ver, typename Tri>
 void Shape<Ver, Tri>::translate(DR::Vertor3f tran) {
     this->ver += tran;
+    this->initMinmax();
 }
 
 template<typename Ver, typename Tri>
@@ -81,6 +200,8 @@ void Shape<Ver, Tri>::scale(DR::Vertor3f scale_) {
                                 0.0f, scale_[1], 0.0f,
                                 0.0f, 0.0f, scale_[2]);
     this->ver = scaleTransform*this->ver;
+    this->initMinmax();
+    this->updateStepSize();
 }
 
 template<typename Ver, typename Tri>

@@ -20,6 +20,7 @@ struct Camera
     Camera() {
         // dir.z() = -0.5;
     }
+
     Ray getRay(int x, int y);
     
 };

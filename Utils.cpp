@@ -45,6 +45,8 @@ void Utils::readOFF(string path, Shape<DR::F3X, DR::S3X>& shape) {
     shape.faceNum = triNum;
     shape.ver = verBuff;
     shape.tri = triBuff;
+    shape.initMinmax();
+    shape.updateStepSize();
     readId0("../data/id0.txt", *shape.id0);
     readId1("../data/id1.txt", *shape.id1);
 

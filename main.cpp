@@ -3,7 +3,9 @@
 #include "Shape.h"
 #include "Camera.h"
 #include "Scene.h"
-
+// #include <cuda_runtime_api.h>
+// // #include <cuda_device_runtime_api.h>
+// #include <device_launch_parameters.h>
 using FloatC = CUDAArray<float>;
 using FloatD = DiffArray<FloatC>;
 
@@ -51,6 +53,7 @@ int main(int argc,char *argv[]){
     // 对物体进行尺度和平移变换
     scene.shape->scale(DR::Vertor3f(0.6, 0.9, 0.6));
     scene.shape->translate(DR::Vertor3f(-0.25, -0.25, -2));
+ 
     scene.rendering();
     scene.saveGrayImg("../data/gray.png");
     
