@@ -77,22 +77,25 @@ float Scene::rayMarching(PtrInteraction nearPoint, PtrInteraction farPoint) {
 
 void Scene::saveGrayImg(string filename) {
     unsigned char rgb[DR::WIDTH * DR::HEIGHT * 3], *p = rgb;
-    unsigned x, y;
+    int x, y;
     int colorValue = 0;
     
     FILE *fp = fopen(filename.c_str(), "wb");
-    for (y = 0; y < DR::WIDTH; y++)
-        for (x = 0; x < DR::HEIGHT; x++) {
+    cout<<"1111";
+    for (y = DR::HEIGHT - 1; y >= 0; y--){
+        for (x = 0; x < DR::WIDTH; x++) {
             colorValue = 0;
-            if ((this->imgBuff[0][y][x] >= 0) && (this->imgBuff[0][y][x] < 256)) // 判断色值范围
+            if (((*this->imgBuff)[x][y] >= 0) && ((*this->imgBuff)[x][y] < 256)) // 判断色值范围
             {
-                colorValue = (int)this->imgBuff[0][y][x];
+                colorValue = (int)(*this->imgBuff)[x][y];
             }
             
             *p++ = (unsigned char)colorValue;    // R
             *p++ = (unsigned char)colorValue;    // G
             *p++ = (unsigned char)colorValue;    // B
         }
+    }
+    cout<<"222";
     svpng(fp, DR::WIDTH, DR::HEIGHT, rgb, 0);
     fclose(fp);
     Utils::msg("Finished Save Gray Img.");
