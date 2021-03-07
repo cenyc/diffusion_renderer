@@ -42,7 +42,6 @@ void Scene::saveGrayImg(string filename) {
     int colorValue = 0;
     
     FILE *fp = fopen(filename.c_str(), "wb");
-    cout<<"1111";
     for (y = DR::HEIGHT - 1; y >= 0; y--){
         for (x = 0; x < DR::WIDTH; x++) {
             colorValue = 0;
@@ -56,7 +55,6 @@ void Scene::saveGrayImg(string filename) {
             *p++ = (unsigned char)colorValue;    // B
         }
     }
-    cout<<"222";
     svpng(fp, DR::WIDTH, DR::HEIGHT, rgb, 0);
     fclose(fp);
     Utils::msg("Finished Save Gray Img.");
