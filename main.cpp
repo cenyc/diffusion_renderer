@@ -51,7 +51,7 @@ int main(int argc,char *argv[]){
     Scene scene(cam, &shape);
     // 对物体进行尺度和平移变换
     scene.shape->scale(DR::Vertor3f(0.6, 0.9, 0.6)*2);
-    scene.shape->translate(DR::Vertor3f(-0.65, -0.75, -4));
+    scene.shape->translate(DR::Vertor3f(-0.65, -0.75, -2.5));
  
     scene.rendering();
     scene.saveGrayImg("../data/gray.png");

@@ -16,8 +16,8 @@ void Scene::rendering() {
         // auto imgBuffColumn = (*imgBuff)[i];
         for (size_t x = 0; x < DR::WIDTH; x++)
         {
-            float u = (x+drand48()) / DR::WIDTH,
-            v = (y+drand48()) / DR::HEIGHT;
+            float u = (x+drand48())/DR::WIDTH,
+            v = (y+drand48())/DR::HEIGHT;
             auto ray = this->cam.getRay(u, v);
             float dirTMax = __FLT_MIN__,
             dirTMin = __FLT_MAX__;
@@ -46,22 +46,15 @@ void Scene::rendering() {
             }
 
             // 如果穿过参与介质
-            if (isHit)
+            if (isHit && hitNum >= 2)
             {
                 DR::Point nearPoint = ray.org + ray.dir * dirTMin;
                 DR::Point farPoint = ray.org + ray.dir * dirTMax;
 
                 PtrInteraction nearInter = new Interaction(nearPoint, ray.dir),
                 farInter = new Interaction(farPoint, ray.dir);
-                (*this->imgBuff)[x][y] = rayMarching(nearInter, farInter);
-            //     // cout << nearInter << endl;
-                // (*this->imgBuff)[x][y] = 255;
-                if (dirTMax - dirTMin < 0.00001 && hitNum < 2)
-                {
-                    // cout << "dirTMax - dirTMin is " << (dirTMax - dirTMin) << endl;
-                    // (*this->imgBuff)[x][y] = 255;
-                    // cout << "dirTMax is " << dirTMax << ", dirTMin is " << dirTMin << ". hitNum is " << hitNum <<endl;
-                }
+                // (*this->imgBuff)[x][y] = rayMarching(nearInter, farInter);
+                (*this->imgBuff)[x][y] = abs(dirTMax - dirTMin)*100;
                 
             }
             
@@ -104,10 +97,6 @@ void Scene::saveGrayImg(string filename) {
     int colorValue = 0;
     
     FILE *fp = fopen(filename.c_str(), "wb");
-<<<<<<< HEAD
-
-=======
->>>>>>> 5295cf19fddfd6053d217c8bc5c0e9b1d8996b5d
     for (y = DR::HEIGHT - 1; y >= 0; y--){
         for (x = 0; x < DR::WIDTH; x++) {
             colorValue = 0;
@@ -127,10 +116,6 @@ void Scene::saveGrayImg(string filename) {
             *p++ = (unsigned char)colorValue;    // B
         }
     }
-<<<<<<< HEAD
-
-=======
->>>>>>> 5295cf19fddfd6053d217c8bc5c0e9b1d8996b5d
     svpng(fp, DR::WIDTH, DR::HEIGHT, rgb, 0);
     fclose(fp);
     Utils::msg("Finished Save Gray Img.");
