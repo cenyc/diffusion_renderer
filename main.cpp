@@ -3,7 +3,9 @@
 #include "Shape.h"
 #include "Camera.h"
 #include "Scene.h"
-
+// #include <cuda_runtime_api.h>
+// // #include <cuda_device_runtime_api.h>
+// #include <device_launch_parameters.h>
 using FloatC = CUDAArray<float>;
 using FloatD = DiffArray<FloatC>;
 
@@ -45,34 +47,13 @@ int main(int argc,char *argv[]){
     // cuda_set_log_level(3);
     Shape<DR::F3X, DR::S3X> shape;
     Utils::readOFF("../data/cube.off", shape);
-
     Camera cam;
     Scene scene(cam, &shape);
     // 对物体进行尺度和平移变换
-    scene.shape->scale(DR::Vertor3f(0.6, 0.9, 0.6));
-    scene.shape->translate(DR::Vertor3f(-0.25, -0.25, -2));
+    scene.shape->scale(DR::Vertor3f(0.6, 0.9, 0.6)*2);
+    scene.shape->translate(DR::Vertor3f(-0.65, -0.75, -4));
+ 
     scene.rendering();
     scene.saveGrayImg("../data/gray.png");
-    
-    // cout << a1[a2] << endl;
-
-    // DR::Vector3fC aas(1.2, 2.2, 1.2);
-    // aas[1] = 3;
-    // cout << aas << endl;
-    // DR::Vector3fC bbs(1.2, 3.2, 1.2);
-    // bbs[0] = 3;
-    // cout << bbs << endl;
-    // using Index = Packet<int, 8>;
-    // for (auto [index, mask]: range<Index>(0, 1000)) {
-
-    // DR::VectorHfC a = zero<DR::VectorHfC>();
-    // cout << a << " " << endl;
-    
-    // cout << abs(-3.4) << endl;
-    
-    // }
-    // test();
-    // Shape<Array<float, 10>, Array<float, 20>> ab(5,6);
-    // ab.vec[3] = 5;
     return 0;
 }
