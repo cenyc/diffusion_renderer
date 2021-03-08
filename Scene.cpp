@@ -94,22 +94,23 @@ float Scene::rayMarching(PtrInteraction nearPoint, PtrInteraction farPoint) {
 void Scene::saveGrayImg(string filename) {
     unsigned char rgb[DR::WIDTH * DR::HEIGHT * 3], *p = rgb;
     int x, y;
-    int colorValue = 0;
+    int colorValue   = 0;
+    float nomalValue = 0.0;
+    float maxValue   = 0.0;
     
     FILE *fp = fopen(filename.c_str(), "wb");
+    for (x = 0; x < DR::WIDTH; x++){
+        for(y = 0; y < DR::HEIGHT; y++){
+            if((*this->imgBuff)[x][y] > maxValue){
+                maxValue = (*this->imgBuff)[x][y];
+            }
+        }
+    }
+    
     for (y = DR::HEIGHT - 1; y >= 0; y--){
         for (x = 0; x < DR::WIDTH; x++) {
-            colorValue = 0;
-            if (((*this->imgBuff)[x][y] >= 0) && ((*this->imgBuff)[x][y] < 256)) // 判断色值范围
-            {
-                colorValue = (int)(*this->imgBuff)[x][y];
-            }
-
-            if (((*this->imgBuff)[x][y] > 255))
-            {
-                colorValue = 255;
-            }
-            
+            nomalValue = (*this->imgBuff)[x][y] / maxValue * 255.0;
+            colorValue = int(nomalValue);
             
             *p++ = (unsigned char)colorValue;    // R
             *p++ = (unsigned char)colorValue;    // G
