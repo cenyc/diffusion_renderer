@@ -104,7 +104,10 @@ void Scene::saveGrayImg(string filename) {
     int colorValue = 0;
     
     FILE *fp = fopen(filename.c_str(), "wb");
+<<<<<<< HEAD
 
+=======
+>>>>>>> 5295cf19fddfd6053d217c8bc5c0e9b1d8996b5d
     for (y = DR::HEIGHT - 1; y >= 0; y--){
         for (x = 0; x < DR::WIDTH; x++) {
             colorValue = 0;
@@ -124,7 +127,10 @@ void Scene::saveGrayImg(string filename) {
             *p++ = (unsigned char)colorValue;    // B
         }
     }
+<<<<<<< HEAD
 
+=======
+>>>>>>> 5295cf19fddfd6053d217c8bc5c0e9b1d8996b5d
     svpng(fp, DR::WIDTH, DR::HEIGHT, rgb, 0);
     fclose(fp);
     Utils::msg("Finished Save Gray Img.");
