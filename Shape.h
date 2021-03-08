@@ -21,7 +21,7 @@ template <typename Ver, typename Tri> struct Shape
     int orgVerID = 0;
     int diagonalVID[2] = {0, 6};
     float step = 0.0;
-    int sampleNum = 25;
+    int sampleNum = 50;
 
     /**
      * @brief 更新采样步长

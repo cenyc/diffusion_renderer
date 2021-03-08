@@ -59,10 +59,10 @@ void Utils::readOFF(string path, Shape<DR::F3X, DR::S3X>& shape) {
 
 void Utils::msg(string msg, bool stop) {
     string line;
-    line.assign(msg.length()+6, '-');
-    cout << line << endl;
-    cout << "[" << msgCount++ << "th] " << msg << endl;
-    cout << line << endl;
+    line.assign(msgCount, ' ');
+    cout << "*";
+    cout << "[line " << msgCount++ << "th] " << msg << endl;
+    // cout << "\\" << endl;
     if (stop)
         exit(EXIT_FAILURE);
 }

@@ -16,23 +16,37 @@ void Scene::rendering() {
         // auto imgBuffColumn = (*imgBuff)[i];
         for (size_t x = 0; x < DR::WIDTH; x++)
         {
-            auto ray = this->cam.getRay(x, y);
+            float u = (x+drand48()) / DR::WIDTH,
+            v = (y+drand48()) / DR::HEIGHT;
+            auto ray = this->cam.getRay(u, v);
             float dirTMax = __FLT_MIN__,
             dirTMin = __FLT_MAX__;
+            bool isHit = false;
+            int hitNum = 0;
             // 遍历所有的面看是否与光线相交
             for (size_t k = 0; k < this->shape->faceNum; k++)
             {
                 HitTriangle hitTran = this->shape->intersect(ray, k);
                 if (hitTran.isHit)
                 {
-                    dirTMax = max(dirTMax, hitTran.dirT);
-                    dirTMin = min(dirTMin, hitTran.dirT);
+                    if (hitTran.dirT > dirTMax)
+                    {
+                        dirTMax = hitTran.dirT;
+                    }
+                    if (hitTran.dirT < dirTMin)
+                    {
+                        dirTMin = hitTran.dirT;
+                    }
+                    // dirTMax = max(dirTMax, hitTran.dirT);
+                    // dirTMin = min(dirTMin, hitTran.dirT);
+                    isHit = true;
+                    hitNum++;
                 }
                 
             }
 
             // 如果穿过参与介质
-            if (dirTMax - dirTMin > 0.0001)
+            if (isHit)
             {
                 DR::Point nearPoint = ray.org + ray.dir * dirTMin;
                 DR::Point farPoint = ray.org + ray.dir * dirTMax;
@@ -41,6 +55,14 @@ void Scene::rendering() {
                 farInter = new Interaction(farPoint, ray.dir);
                 (*this->imgBuff)[x][y] = rayMarching(nearInter, farInter);
             //     // cout << nearInter << endl;
+                // (*this->imgBuff)[x][y] = 255;
+                if (dirTMax - dirTMin < 0.00001 && hitNum < 2)
+                {
+                    // cout << "dirTMax - dirTMin is " << (dirTMax - dirTMin) << endl;
+                    // (*this->imgBuff)[x][y] = 255;
+                    // cout << "dirTMax is " << dirTMax << ", dirTMin is " << dirTMin << ". hitNum is " << hitNum <<endl;
+                }
+                
             }
             
         }
@@ -59,6 +81,7 @@ float Scene::rayMarching(PtrInteraction nearPoint, PtrInteraction farPoint) {
     float pathLength = norm((farPoint->hitPoint - nearPoint->hitPoint));
     auto currentPoint = nearPoint->hitPoint;
     float currentLength = 0.0;
+    auto dir = normalize(farPoint->hitPoint - nearPoint->hitPoint);
     while (currentLength <= pathLength)
     {
         auto voxelPoint = round(this->shape->world2voxel(&currentPoint));
@@ -67,7 +90,7 @@ float Scene::rayMarching(PtrInteraction nearPoint, PtrInteraction farPoint) {
         auto id1 = this->shape->getIntensity1(voxelPoint);
         intensity += id0 + dot(id1, nearPoint->dir);
         // 更新位置
-        currentPoint += farPoint->dir*this->shape->step;
+        currentPoint += dir*this->shape->step;
         currentLength += this->shape->step;
     }
 
@@ -89,6 +112,12 @@ void Scene::saveGrayImg(string filename) {
             {
                 colorValue = (int)(*this->imgBuff)[x][y];
             }
+
+            if (((*this->imgBuff)[x][y] > 255))
+            {
+                colorValue = 255;
+            }
+            
             
             *p++ = (unsigned char)colorValue;    // R
             *p++ = (unsigned char)colorValue;    // G

@@ -9,8 +9,8 @@ struct Cone {
 struct Camera
 {
     DR::Point org = zero<DR::Point>();
-    DR::Point dir_h = DR::Point(1, 0, 0);
-    DR::Point dir_v = DR::Point(0, 1, 0);
+    DR::Point dir_h = DR::Point(2, 0, 0);
+    DR::Point dir_v = DR::Point(0, 2, 0);
     int height = DR::HEIGHT;
     int width = DR::WIDTH;
     Cone cone;
@@ -21,7 +21,7 @@ struct Camera
         // dir.z() = -0.5;
     }
 
-    Ray getRay(int x, int y);
+    Ray getRay(float u, float v);
     
 };
 
