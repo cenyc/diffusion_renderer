@@ -1,4 +1,6 @@
 #include "Utils.h"
+#include "Shape.h"
+#include "Shape.cpp"
 int msgCount = 1;
 void Utils::readOFF(string path, Shape<DR::F3X, DR::S3X>& shape) {
     Utils::msg("Start reading off file.");

@@ -20,7 +20,7 @@ link_directories(/home/cenyc/Library/enoki/build)
 # link_libraries加在add_executable之前
 # link_libraries(enoki-cuda enoki-autodiff)
 
-set(SOURCE_FILES Utils.cpp Camera.cpp Scene.cpp)
+set(SOURCE_FILES Utils.cpp Camera.cpp Scene.cpp Shape.cpp)
 add_library(self_define ${SOURCE_FILES})
 
 add_executable(diffusion_renderer main.cpp)
