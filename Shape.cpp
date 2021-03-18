@@ -342,7 +342,7 @@ DR::Density * Shape<Ver, Tri>::getId0(float light_intensity, float step){
         this->updataBoundary(id0, Qri_1, kappa, step);
         error = this->countError(id0_last, id0);
         cout<<"iterat:"<<i<<" error:"<<error<<endl;
-        if(error < 0.001){
+        if(error < 0.01){
             cout<<"id0 has been converged"<<endl;
             break;
         }
