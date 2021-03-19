@@ -42,31 +42,32 @@ void test() {
     string fileName = "rgb.png";
     scene.saveGrayImg(fileName);
     */
+   /*
+    求解id0 和id1
+    DR::Density *den = (DR::Density *) malloc(sizeof(zero<DR::Density>()));
+    *den = zero<DR::Density>();
+    //设置密度
+    setDensityValue(den, 0.5);
+    //设置参数
+    shape.setParam(5.06, 5.0, 0.4, den);
+    DR::Density *id0 = NULL;
+    id0 = shape.getId0(1000, 0.0625);
+    DR::ID1 *id1 = NULL;
+    id1 = shape.getId1(id0, 0.0625);
+   */
 }
 
 int main(int argc,char *argv[]){    
     // cuda_set_log_level(3);
     Shape<DR::F3X, DR::S3X> shape;
     Utils::readOFF("../data/cube.off", shape);
-    
-    DR::Density *den = (DR::Density *) malloc(sizeof(zero<DR::Density>()));
-    *den = zero<DR::Density>();
-    setDensityValue(den, 0.5);
-    
-    shape.setParam(5.06, 5.0, 0.4, den);
-
-    //cout<<(*shape.getId0(1000, 0.0625))[0][0][1]<<endl;
-    DR::Density *id0 = (DR::Density *) malloc(sizeof(zero<DR::Density>()));
-    id0 = shape.getId0(1000, 0.0625);
-    cout<<"id0"<<(*id0)[0][0][0]<<"2"<<(*id0)[0][0][1]<<"3"<<(*id0)[1][1][1]<<"4"<<(*id0)[2][2][2]<<endl;
-    shape.getId1(id0, 0.0625);
-    //Camera cam;
-    //Scene scene(cam, &shape);
+    Camera cam;
+    Scene scene(cam, &shape);
     // 对物体进行尺度和平移变换
-    //scene.shape->scale(DR::Vertor3f(0.6, 0.9, 0.6)*2);
-    //scene.shape->translate(DR::Vertor3f(-0.65, -0.75, -4));
+    scene.shape->scale(DR::Vertor3f(0.6, 0.9, 0.6)*2);
+    scene.shape->translate(DR::Vertor3f(-0.65, -0.75, -4));
  
-    //.rendering();
-    //scene.saveGrayImg("../data/gray.png");
+    scene.rendering();
+    scene.saveGrayImg("../data/gray.png");
     return 0;
 }

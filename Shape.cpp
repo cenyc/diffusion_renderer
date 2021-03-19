@@ -245,8 +245,7 @@ void Shape<Ver, Tri>::updataId0(DR::Density * _id0, DR::Density * _alpha, DR::De
 }
 
 template<typename Ver, typename Tri>
-DR::IdGrid * Shape<Ver, Tri>::getGrid(DR::Density * _id0, float step){
-    DR::IdGrid * idGrid = (DR::IdGrid *) malloc(sizeof(zero<DR::IdGrid>()));
+DR::ID1 * Shape<Ver, Tri>::getGrid(DR::Density * _id0, DR::ID1 * idGrid, float step){
     const int nworker = omp_get_num_procs();
     #pragma omp parallel for num_threads(nworker) schedule(dynamic, 1)
     for(int i = 0;i < DR::ID_WIDTH; i++){
@@ -270,8 +269,7 @@ DR::IdGrid * Shape<Ver, Tri>::getGrid(DR::Density * _id0, float step){
 template<typename Ver, typename Tri>
 DR::Density * Shape<Ver, Tri>::getId0(float light_intensity, float step){
     // 初始化id0， 均为1
-    DR::Density *id0 = (DR::Density *) malloc(sizeof(zero<DR::Density>()));
-    setDensityValue(id0, 1);
+    setDensityValue(this->id0, 1);
     
     // 初始化Ir i,光强经过消光单方向递减
     DR::Density *Ir_i = (DR::Density *) malloc(sizeof(zero<DR::Density>()));
@@ -284,13 +282,11 @@ DR::Density * Shape<Ver, Tri>::getId0(float light_intensity, float step){
     }
 
     // Qri_0和Qri_1
-    DR::Density *Qri_0 = (DR::Density *) malloc(sizeof(zero<DR::Density>()));
     #pragma omp parallel for num_threads(nworker) schedule(dynamic, 1)
     for(int i = 0; i < DR::ID_WIDTH; i++){
-        (*Qri_0)[i] = (*Ir_i)[i] / (4 * pi);
+        (*this->Qri_0)[i] = (*Ir_i)[i] / (4 * pi);
     }
 
-    this->Qri_1 = (DR::Density *) malloc(sizeof(zero<DR::Density>()));
     float mu = this->getMu(1000);
     #pragma omp parallel for num_threads(nworker) schedule(dynamic, 1)
     for(int i = 0; i < DR::ID_WIDTH; i++){
@@ -307,11 +303,10 @@ DR::Density * Shape<Ver, Tri>::getId0(float light_intensity, float step){
 
     float sigmaTr = this->getSigma_Tr();
     // 求解S
-    DR::Density *S     = (DR::Density *) malloc(sizeof(zero<DR::Density>()));
-    *S = zero<DR::Density>();
+    *this->S = zero<DR::Density>();
     #pragma omp parallel for num_threads(nworker) schedule(dynamic, 1)
     for(int i = 0; i < DR::ID_WIDTH; i++){
-        (*S)[i] = (this->sigmaS * (*this->density)[i] * (*Qri_0)[i]) -
+        (*this->S)[i] = (this->sigmaS * (*this->density)[i] * (*this->Qri_0)[i]) -
         (this->sigmaS / sigmaTr)*(*Qri_1_grad)[i];
     }
 
@@ -323,13 +318,12 @@ DR::Density * Shape<Ver, Tri>::getId0(float light_intensity, float step){
     }
 
     // 求解alpha
-    DR::Density *alpha = (DR::Density *) malloc(sizeof(zero<DR::Density>()));
     #pragma omp parallel for num_threads(nworker) schedule(dynamic, 1)
     for(int i = 0; i < DR::ID_WIDTH; i++){
-        (*alpha)[i] = this->sigmaA * (*this->density)[i];
+        (*this->alpha)[i] = this->sigmaA * (*this->density)[i];
     }
 
-    this->updataBoundary(id0, Qri_1, kappa, step);
+    this->updataBoundary(this->id0, this->Qri_1, this->kappa, step);
     DR::Density *id0_last = (DR::Density *) malloc(sizeof(zero<DR::Density>()));
     
     // 松弛法求解
@@ -337,11 +331,13 @@ DR::Density * Shape<Ver, Tri>::getId0(float light_intensity, float step){
     int64_t start_time = CurrentTimeMillis();
     
     for(int i = 0;i < 1000; i++){
-        this->copyValue(id0, id0_last);
-        this->updataId0(id0, alpha, kappa, S, step);
-        this->updataBoundary(id0, Qri_1, kappa, step);
-        error = this->countError(id0_last, id0);
-        cout<<"iterat:"<<i<<" error:"<<error<<endl;
+        this->copyValue(this->id0, id0_last);
+        this->updataId0(this->id0, this->alpha, this->kappa, this->S, step);
+        this->updataBoundary(this->id0, this->Qri_1, this->kappa, step);
+        error = this->countError(id0_last, this->id0);
+        if(i % 10 == 0){
+            cout<<"iterat:"<<i<<" error:"<<error<<endl;
+        }
         if(error < 0.01){
             cout<<"id0 has been converged"<<endl;
             break;
@@ -349,24 +345,23 @@ DR::Density * Shape<Ver, Tri>::getId0(float light_intensity, float step){
     }
     std::cout << "time is: " <<CurrentTimeMillis() - start_time << " ms" << std::endl;
     
-    return id0;
+    return this->id0;
 }
 
 template<typename Ver, typename Tri>
-DR::IdGrid * Shape<Ver, Tri>::getId1(DR::Density * _id0, float step){
+DR::ID1 * Shape<Ver, Tri>::getId1(DR::Density * _id0, float step){
     // 初始化id0， 均为1
-    DR::IdGrid *id1 = NULL;
-    id1 = this->getGrid(_id0, step);
+    this->getGrid(_id0, this->id1, step);
     for(int i = 0;i < DR::ID_WIDTH; i++){
         for(int j = 0; j < DR::ID_HEIGHT; j++){
             for(int k = 0; k < DR::ID_WIDTH; k++){
-                (*id1)[i][j][k][0] = (-1) * (*this->kappa)[i][j][k] * (*id1)[i][j][k][0] + this->sigmaS * (*this->density)[i][j][k] * (*this->Qri_1)[i][j][k];
-                (*id1)[i][j][k][1] = (-1) * (*this->kappa)[i][j][k] * (*id1)[i][j][k][1];
-                (*id1)[i][j][k][2] = (-1) * (*this->kappa)[i][j][k] * (*id1)[i][j][k][2];
+                (*this->id1)[i][j][k][0] = (-1) * (*this->kappa)[i][j][k] * (*this->id1)[i][j][k][0] + this->sigmaS * (*this->density)[i][j][k] * (*this->Qri_1)[i][j][k];
+                (*this->id1)[i][j][k][1] = (-1) * (*this->kappa)[i][j][k] * (*this->id1)[i][j][k][1];
+                (*this->id1)[i][j][k][2] = (-1) * (*this->kappa)[i][j][k] * (*this->id1)[i][j][k][2];
             }
         }
     }
-    return id1;
+    return this->id1;
 }
 
 void setDensityValue(DR::Density * den, float _value){

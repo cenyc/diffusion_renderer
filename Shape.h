@@ -29,7 +29,7 @@ template <typename Ver, typename Tri> struct Shape
     int faceNum;
     Ver ver;
     Tri tri;
-    DR::ID0 *id0 = (DR::ID0*) malloc(sizeof(zero<DR::ID0>()));
+    DR::Density *id0 = (DR::Density*) malloc(sizeof(zero<DR::Density>()));
     DR::ID1 *id1 = (DR::ID1*) malloc(sizeof(zero<DR::ID1>()));
     int orgVerID = 0;
     int diagonalVID[2] = {0, 6};
@@ -41,8 +41,11 @@ template <typename Ver, typename Tri> struct Shape
     float sigmaT = 0.0;
     float hg_G   = 0.0;
     DR::Density *density = NULL;
-    DR::Density *Qri_1 = NULL;
-    DR::Density *kappa = NULL;
+    DR::Density *Qri_0 = (DR::Density*) malloc(sizeof(zero<DR::Density>()));
+    DR::Density *Qri_1 = (DR::Density*) malloc(sizeof(zero<DR::Density>()));
+    DR::Density *kappa = (DR::Density*) malloc(sizeof(zero<DR::Density>()));
+    DR::Density *S     = (DR::Density*) malloc(sizeof(zero<DR::Density>()));
+    DR::Density *alpha = (DR::Density*) malloc(sizeof(zero<DR::Density>()));
 
     /**
      * @brief 初始化
@@ -193,7 +196,7 @@ template <typename Ver, typename Tri> struct Shape
      * @param light_intensity:光强 step：步长
      * @return 
      */
-    DR::IdGrid * getGrid(DR::Density * _id0, float step);
+    DR::ID1 * getGrid(DR::Density * _id0, DR::ID1 * _id1, float step);
     /**
      * @brief 得到Id0
      * 
@@ -207,7 +210,7 @@ template <typename Ver, typename Tri> struct Shape
      * @param _id0:_id0 step：步长
      * @return 
      */
-    DR::IdGrid * getId1(DR::Density * _id0, float step);
+    DR::ID1 * getId1(DR::Density * _id0, float step);
     /**
      * @brief 定义Id 0边界条件
      * 
