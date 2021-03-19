@@ -16,22 +16,50 @@ struct Scene
 {
     Shape<DR::F3X, DR::S3X> *shape;
     Camera cam;
-    
-    DR::ImgBuff *imgBuff = (DR::ImgBuff*) malloc(sizeof(zero<DR::ImgBuff>()));
+    DR::ImgBuff3 *targetImgBuff = (DR::ImgBuff3*) malloc(sizeof(zero<DR::ImgBuff3>()));
+    DR::ImgBuff3 *imgBuff = (DR::ImgBuff3*) malloc(sizeof(zero<DR::ImgBuff3>()));
     DR::RayBuff *rayBuff = (DR::RayBuff*) malloc(sizeof(zero<DR::RayBuff>()));
+    DR::DiffArrayf3 lightColor;
+    DR::DF loss = 0.0;
     // Scene(Shape<DR::F3X, DR::S3X> shape_, Camera cam_)
     Scene(Camera cam_, Shape<DR::F3X, DR::S3X> *shape_) {
         this->shape = shape_;
         this->cam = cam_;
-        (*this->imgBuff) = zero<DR::ImgBuff>();
+        (*this->imgBuff) = zero<DR::ImgBuff3>();
         (*this->rayBuff) = zero<DR::RayBuff>();
+        lightColor = DR::DiffArrayf3(0.8, 0.7, 0.3);
     }
-    float rayMarching(PtrInteraction nearPoint, PtrInteraction farPoint);
+    /**
+     * @brief 计算由环境光经衰减后的光强贡献（目前只考虑平行光）
+     * 
+     * @param nearInter 
+     * @param farInter 
+     * @return float 
+     */
+    float getIri(DR::Point dir, float dist);
+
+    float getIri(Ray ray);
+
+    static float attenuation(float dist);
+
+    /**
+     * @brief 计算targetImgBuff与imgBuff的loss值
+     * 
+     */
+    void computeLoss();
+
+    float rayMarching(const HitRecord& hitrecord);
     /**
      * @brief 渲染场景
      * 
      */
-    void rendering();
+    void rendering(DR::ImgBuff3* ptrImgBuff);
+
+    /**
+     * @brief 渲染场景
+     * 
+     */
+    void renderingParallel(DR::ImgBuff3* ptrImgBuff);
 
     /**
      * @brief 生成灰度图像，来源于场景中imgBuff的数据
@@ -41,6 +69,13 @@ struct Scene
     void saveGrayImg(string filename);
 
     /**
+     * @brief 保存彩色图像
+     * 
+     * @param filename 
+     */
+    void saveColorImg(string filename, DR::ImgBuff3 *ptrImgBuff);
+
+    /**
      * @brief Destroy the Scene object
      * 
      */
@@ -48,6 +83,7 @@ struct Scene
         Utils::msg("Destroy the Scene object.");
         free(this->rayBuff);
         free(this->imgBuff);
+        free(this->targetImgBuff);
     }
 };
 
