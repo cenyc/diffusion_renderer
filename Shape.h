@@ -2,6 +2,7 @@
 #define __SHAPE_H__
 #include "common.h"
 #include "Ray.h"
+#include "AABB.h"
 #include <cmath>
 #include <chrono>
 
@@ -35,6 +36,7 @@ template <typename Ver, typename Tri> struct Shape
     int diagonalVID[2] = {0, 6};
     float step = 0.0;
     int sampleNum = 50;
+    AABB aabb = AABB(DR::Point(0,0,0), DR::Point(1,1,1));
 
     float sigmaA = 0.0;
     float sigmaS = 0.0;
@@ -109,14 +111,14 @@ template <typename Ver, typename Tri> struct Shape
      * 
      * @param tran （tran[0], tran[1], tran[2]）分别对应x, y, z轴的偏移量
      */
-    void translate(DR::Vertor3f tran);
+    void translate(DR::Point tran);
 
     /**
      * @brief 对shape的顶点进行尺度的变换
      * 
      * @param scale_ （scale_[0], scale_[1], scale_[2]）分别对应x, y, z轴方向缩放的尺度
      */
-    void scale(DR::Vertor3f scale_);
+    void scale(DR::Point scale_);
 
     /**
      * @brief 根据光线和三角形的id索引计算该三角形与光线是否相交
@@ -157,7 +159,7 @@ template <typename Ver, typename Tri> struct Shape
     /**
      * @brief 根据体素坐标的位置获取id0的值
      * 
-     * @param worldCoordinate 
+     * @param voxelVer 
      * @return float 
      */
     float getIntensity0(DR::Point voxelVer);
