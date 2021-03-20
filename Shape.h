@@ -3,12 +3,25 @@
 #include "common.h"
 #include "Ray.h"
 #include "AABB.h"
+#include <cmath>
+#include <chrono>
+
+#define pi 3.1415926
+
 // #include "Utils.h"
 struct HitTriangle {
     bool isHit = true;
     float dirT;
     float u, v;
 };
+
+static void setDensityValue(DR::Density * den, float _value);
+static int64_t CurrentTimeMillis()
+{
+    int64_t timems = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+    return timems;
+}
+
 
 template <typename Ver, typename Tri> struct Shape
 {
@@ -17,13 +30,30 @@ template <typename Ver, typename Tri> struct Shape
     int faceNum;
     Ver ver;
     Tri tri;
-    DR::ID0 *id0 = (DR::ID0*) malloc(sizeof(zero<DR::ID0>()));
+    DR::Density *id0 = (DR::Density*) malloc(sizeof(zero<DR::Density>()));
     DR::ID1 *id1 = (DR::ID1*) malloc(sizeof(zero<DR::ID1>()));
     int orgVerID = 0;
     int diagonalVID[2] = {0, 6};
     float step = 0.0;
     int sampleNum = 50;
     AABB aabb = AABB(DR::Point(0,0,0), DR::Point(1,1,1));
+
+    float sigmaA = 0.0;
+    float sigmaS = 0.0;
+    float sigmaT = 0.0;
+    float hg_G   = 0.0;
+    DR::Density *density = NULL;
+    DR::Density *Qri_0 = (DR::Density*) malloc(sizeof(zero<DR::Density>()));
+    DR::Density *Qri_1 = (DR::Density*) malloc(sizeof(zero<DR::Density>()));
+    DR::Density *kappa = (DR::Density*) malloc(sizeof(zero<DR::Density>()));
+    DR::Density *S     = (DR::Density*) malloc(sizeof(zero<DR::Density>()));
+    DR::Density *alpha = (DR::Density*) malloc(sizeof(zero<DR::Density>()));
+
+    /**
+     * @brief 初始化
+     * 
+     */
+    void setParam(float _sigmaA, float _sigmaS, float hg_G, DR::Density * _desity);
     /**
      * @brief 更新采样步长
      * 
@@ -121,6 +151,9 @@ template <typename Ver, typename Tri> struct Shape
         cout << "Free Shape space." << endl;
         free(this->id0);
         free(this->id1);
+        free(this->density);
+        free(this->Qri_1);
+        free(this->kappa);
     }
 
     /**
@@ -138,137 +171,79 @@ template <typename Ver, typename Tri> struct Shape
      * @return DR::Point 
      */
     DR::Point getIntensity1(DR::Point voxelVer);
+    /**
+     * @brief phase function 输入cos_theta
+     * 
+     * @param cos_theta
+     * @return 
+     */
+    float phaseFunction(float cos_theta);
+    /**
+     * @brief 输入n得到mu
+     * 
+     * @param n
+     * @return 
+     */
+    float getMu(int n);
+    /**
+     * @brief 得到Sigma Tr
+     * 
+     * @param n
+     * @return 
+     */
+    float getSigma_Tr();
+    /**
+     * @brief 得到Id0
+     * 
+     * @param light_intensity:光强 step：步长
+     * @return 
+     */
+    DR::ID1 * getGrid(DR::Density * _id0, DR::ID1 * _id1, float step);
+    /**
+     * @brief 得到Id0
+     * 
+     * @param light_intensity:光强 step：步长
+     * @return 
+     */
+    DR::Density * getId0(float light_intensity, float step);
+    /**
+     * @brief 得到Id1
+     * 
+     * @param _id0:_id0 step：步长
+     * @return 
+     */
+    DR::ID1 * getId1(DR::Density * _id0, float step);
+    /**
+     * @brief 定义Id 0边界条件
+     * 
+     * @param id0,Qri_1,kappa, step：步长
+     * @return void
+     */
+    void updataBoundary(DR::Density * _id0, DR::Density * _Qri_1, DR::Density * _kappa, float step);
+    /**
+     * @brief 计算Id 0内部值
+     * 
+     * @param id0,alpha,kappa, S, step：步长
+     * @return void
+     */
+    void updataId0(DR::Density * _id0, DR::Density * _alpha, DR::Density * _kappa, DR::Density * _S, float step);
+    /**
+     * @brief 复制体数据的值
+     * 
+     * @param from,to
+     * @return void
+     */
+    void copyValue(DR::Density * _from, DR::Density * _to);
+    /**
+     * @brief 计算松弛法迭代一次的损失
+     * 
+     * @param last， now
+     * @return 损失
+     */
+    float countError(DR::Density * _lastValue, DR::Density * _nowValue);
 
     ENOKI_STRUCT(Shape, verNum, faceNum, ver, tri)
 };
 ENOKI_STRUCT_SUPPORT(Shape, verNum, faceNum, ver, tri)
-
-
-template<typename Ver, typename Tri>
-void Shape<Ver, Tri>::updateStepSize() {
-    this->step = norm(this->getVer(this->diagonalVID[0]) - this->getVer(this->diagonalVID[1])) / this->sampleNum;
-}
-
-template<typename Ver, typename Tri>
-DR::Point Shape<Ver, Tri>::getIntensity1(DR::Point voxelVer) {
-    return (*this->id1)[voxelVer[0]][voxelVer[1]][voxelVer[2]];
-}
-
-template<typename Ver, typename Tri>
-float Shape<Ver, Tri>::getIntensity0(DR::Point voxelVer) {
-    return (*this->id0)[voxelVer[0]][voxelVer[1]][voxelVer[2]];
-}
-
-template<typename Ver, typename Tri>
-DR::Point Shape<Ver, Tri>::getOrgVer() {
-    return getVer(this->orgVerID);
-}
-
-template<typename Ver, typename Tri>
-void Shape<Ver, Tri>::initMinmax () {
-    for (size_t i = 0; i < 3; i++)
-    {
-        this->minmax[0][i] = hmin(this->ver[i]);
-        this->minmax[1][i] = hmax(this->ver[i]);
-        this->minmax[2][i] = abs(this->minmax[1][i] - this->minmax[0][i]);
-    }
-}
-
-template<typename Ver, typename Tri>
-DR::Point Shape<Ver, Tri>::world2voxel(DR::Point* ptrVer) {
-    auto localVer = world2local(ptrVer);
-    return local2voxel(&localVer);
-}
-
-template<typename Ver, typename Tri>
-DR::Point Shape<Ver, Tri>::local2voxel(DR::Point* ptrVer) {
-    auto voxel = ((*ptrVer)/this->aabb.xyzLength) * DR::Point(DR::ID_WIDTH-1, DR::ID_HEIGHT-1, DR::ID_WIDTH-1);
-    return voxel;
-}
-
-template<typename Ver, typename Tri>
-DR::Point Shape<Ver, Tri>::world2local(DR::Point* ptrVer) {
-    return (*ptrVer) - this->aabb.min;
-}
-
-template<typename Ver, typename Tri>
-void Shape<Ver, Tri>::translate(DR::Vertor3f tran) {
-    this->aabb.minimum += tran;
-    this->aabb.maximum += tran;
-    this->aabb.update();
-}
-
-template<typename Ver, typename Tri>
-void Shape<Ver, Tri>::scale(DR::Vertor3f scale_) {
-    DR::Matrix3f scaleTransform(scale_[0], 0.0f, 0.0f,
-                                0.0f, scale_[1], 0.0f,
-                                0.0f, 0.0f, scale_[2]);
-    this->aabb.minimum = scaleTransform*this->aabb.minimum;
-    this->aabb.maximum = scaleTransform*this->aabb.maximum;
-    this->aabb.update();
-}
-
-template<typename Ver, typename Tri>
-DR::ID3 Shape<Ver, Tri>::getTriIDs(size_t faceID) {
-    return slice(this->tri, faceID);
-}
-
-template<typename Ver, typename Tri>
-DR::Point Shape<Ver, Tri>::getVer(size_t index_){
-    return slice(this->ver, index_);
-};
-
-template<typename Ver, typename Tri>
-HitTriangle Shape<Ver, Tri>::intersect(Ray ray, size_t faceID) {
-    float dirT = 0.0, u = 0.0, v = 0.0;
-    HitTriangle hitTri = HitTriangle();
-
-    // 根据faceID的索引获取三个顶点的位置
-    auto triIDs = getTriIDs(faceID);
-    auto v0 = getVer(triIDs.x()),
-    v1 = getVer(triIDs.y()),
-    v2 = getVer(triIDs.z());
-
-    // e1, e2
-    DR::Edge e1 = v1 - v0, 
-    e2 = v2 - v0;
-    // p
-    auto p = cross(ray.dir, e2);
-    // determinant
-    auto det = dot(e1, p);
-    DR::Point t = zero<DR::Point>();
-
-    if (det > 0)
-    {
-        t = ray.org - v0;
-    }else {
-        t = v0 - ray.org;
-        det = -det;
-    }
-
-    if (det < 0.0001) {
-        hitTri.isHit = false;
-    }else {
-        auto u = dot(t, p);
-        if (u < 0 || u > det)
-        {
-            hitTri.isHit = false;
-        }else {
-            auto q = cross(t, e1);
-            auto v = dot(ray.dir, q);
-            if (v < 0 || (u+v) > det)   
-            {
-                hitTri.isHit = false;
-            }else {
-                float fInvDet = 1.0/det;
-                hitTri.dirT = dot(e2, q) * fInvDet;
-                hitTri.u = u * fInvDet;
-                hitTri.v = v * fInvDet;
-            }
-        }
-    }
-    
-    return hitTri;
-}
 
 #endif

@@ -29,7 +29,7 @@ struct Utils {
      * @param path 文件路径
      * @return value 返回的读取数据，若是id0为64*64*96大小的数组，若是id1为64*64*96*3大小的数组
      */
-    static bool readId0(string path, DR::ID0 &id0);
+    static bool readId0(string path, DR::Density &id0);
     static bool readId1(string path, DR::ID1 &id1);
 
     /**
