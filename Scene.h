@@ -46,7 +46,7 @@ struct Scene
      * @brief 计算targetImgBuff与imgBuff的loss值
      * 
      */
-    void computeLoss();
+    DR::DF computeLoss(DR::ImgBuff3* targetImg, DR::ImgBuff3* sourceImg);
 
     float rayMarching(const HitRecord& hitrecord);
     /**

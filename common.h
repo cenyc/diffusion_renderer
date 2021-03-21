@@ -11,6 +11,7 @@
 #include <enoki/special.h>
 #include <enoki/dynamic.h>
 #include <enoki/matrix.h>
+#include <enoki-thread/thread.h>
 using namespace enoki;
 using namespace std;
 
@@ -24,7 +25,7 @@ static const int ID_HEIGHT = 96;
 // 学习率
 static const float LR = 0.001;
 
-static const int SAMPLE_NUM = 50;
+static const int SAMPLE_NUM = 150;
 // 环境光强度
 static const int ENV_INTSITY = 1;
 static const int ALBEDO = 1;

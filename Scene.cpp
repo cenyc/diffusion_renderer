@@ -1,7 +1,6 @@
 #include "Scene.h"
 #include "include/svpng.inc"
 
-
 float Scene::attenuation(float dist) {
     return exp(-1.8 * dist);
 }
@@ -57,25 +56,11 @@ float Scene::getIri(DR::Point dir, float dist) {
     return Iri;
 }
 
-void Scene::computeLoss() {
-    auto diff = (*targetImgBuff - *imgBuff);
-    cout << diff << endl;
-    for (size_t i = 0; i < DR::WIDTH; i++)
-    {
-        for (size_t j = 0; j < DR::HEIGHT; j++)
-        {
-            for (size_t k = 0; k < 3; k++)
-            {
-                this->loss += enoki::pow(diff[k][i][j], 2);
-            }
-        }
-    }
-}
-
 void Scene::rendering(DR::ImgBuff3* ptrImgBuff) {
     Utils::msg("Start scene rendering.");
     int count = 1;
     float max_t = 0.0;
+
     for (size_t y = 0; y < DR::HEIGHT; y++)
     {
         // auto imgBuffColumn = (*imgBuff)[i];
@@ -178,6 +163,11 @@ float Scene::rayMarching(const HitRecord& hitRecord) {
     return Iri + Id;
 }
 
+DR::DF Scene::computeLoss(DR::ImgBuff3* targetImg, DR::ImgBuff3* sourceImg) {
+    auto diff = (*targetImg) - (*sourceImg);
+    auto sum = hsum_nested(diff*diff);
+    return sum / (DR::WIDTH*DR::HEIGHT);
+}
 
 void Scene::saveColorImg(string filename, DR::ImgBuff3 *ptrImgBuff) {
     unsigned char rgb[DR::WIDTH * DR::HEIGHT * 3], *p = rgb;

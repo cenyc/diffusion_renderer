@@ -7,8 +7,6 @@
 // #include <cuda_runtime_api.h>
 // // #include <cuda_device_runtime_api.h>
 // #include <device_launch_parameters.h>
-using FloatC = CUDAArray<float>;
-using FloatD = DiffArray<FloatC>;
 
 template <typename Value> Value srgb_gamma(Value x) {
     return select(
@@ -18,16 +16,16 @@ template <typename Value> Value srgb_gamma(Value x) {
     );
 }
 int main(int argc,char *argv[]) {
-    using A = Array<float, 3>;
-    A a(1,2,3);
-    cout << a << endl;
+    // using FloatD = DiffArray<DR::FloatC>;
+    // FloatD a = 1.0;
+    // cout << a << endl;
+    return 0;
 }
 int main1(int argc,char *argv[]) {
     Shape<DR::F3X, DR::S3X> shape;
     // Utils::readOFF("../data/cube.off", shape);
     Camera cam;
     Scene scene(cam, &shape);
-    DR::DF loss = 0.0;
     // 对物体进行尺度和平移变换
     scene.shape->scale(DR::Point(0.6, 0.9, 0.6)*2);
     scene.shape->translate(DR::Point(-0.65, -0.75, -2.5));
@@ -38,73 +36,22 @@ int main1(int argc,char *argv[]) {
 
     // 改变光源颜色
     scene.lightColor = DR::DiffArrayf3(0.1, 0.5, 0.8);
-
+    using Index = Array<Packet<uint32_t, 100>, 3>;
     for (size_t i = 0; i < 1000; i++)
     {
+        DR::DF loss = 0.0, sum = 0.0;
         set_requires_gradient(scene.lightColor);
         scene.rendering(scene.imgBuff);
         scene.saveColorImg("../results/img.png", scene.imgBuff);
-        DR::DF test = 1.4;
+
         // 进行梯度优化
-        auto diff = (*scene.targetImgBuff) - (*scene.imgBuff);
-        for (size_t i = 0; i < DR::WIDTH; i++)
-        {
-            for (size_t j = 0; j < DR::HEIGHT; j++)
-            {
-                // diff += enoki::pow((*scene.imgBuff)[0][i][j] - test, 2);
-                loss += enoki::pow(diff[0][i][j], 2) + enoki::pow(diff[1][i][j], 2) + enoki::pow(diff[2][i][j], 2);
-                // loss += enoki::pow((*scene.imgBuff), 2);
-                // cout << "loss is " << loss << endl;
-            }
-        }
-        // loss = loss * 1.0/(DR::WIDTH*DR::HEIGHT);
+        loss = scene.computeLoss(scene.targetImgBuff, scene.imgBuff);
         backward(loss);
         cout << "loss is " << loss << ", gradient is " << gradient(scene.lightColor) << endl;
-        scene.lightColor -= gradient(scene.lightColor)*0.0001;
+        scene.lightColor -= gradient(scene.lightColor)*0.1;
         cout << "light color is " << scene.lightColor << endl;
-        loss = 0.0;
+        // loss = 0.0;
         (*scene.imgBuff) = zero<DR::ImgBuff3>();
-        scene.saveColorImg("../results/img1.png", scene.imgBuff);
-
     }
-    
-
-    
-    // loss = 0.0;
     return 0;
 }
-
-// int main1(int argc,char *argv[]){    
-//     // cuda_set_log_level(3);
-//     Shape<DR::F3X, DR::S3X> shape;
-//     Utils::readOFF("../data/cube.off", shape);
-//     Camera cam;
-//     Scene scene(cam, &shape);
-//     DR::DF loss = 0.0;
-//     // 对物体进行尺度和平移变换
-//     scene.shape->scale(DR::Vertor3f(0.6, 0.9, 0.6)*2);
-//     scene.shape->translate(DR::Vertor3f(-0.65, -0.75, -2.5));
-
-//     // 生成目标图像
-//     scene.renderingParallel(scene.targetImgBuff);
-//     scene.saveColorImg("../results/target.png", scene.targetImgBuff);
-//     // 更改光照颜色
-//     scene.lightColor = DR::DiffArrayf3(0.1, 0.5, 0.8);
-//     set_requires_gradient(scene.lightColor);
-//     scene.rendering(scene.imgBuff);
-//     // scene.saveColorImg("../results/img.png", scene.imgBuff);
-//     // (*scene.imgBuff) -= (*scene.targetImgBuff);
-//     // 进行梯度优化
-//     for (size_t i = 0; i < DR::WIDTH; i++)
-//     {
-//         for (size_t j = 0; j < DR::HEIGHT; j++)
-//         {
-//             loss += enoki::pow((*scene.imgBuff)[0][i][j], 2) + enoki::pow((*scene.imgBuff)[1][i][j], 2) + enoki::pow((*scene.imgBuff)[2][i][j], 2);
-//         }
-//     }
-//     loss *= 1.0/(DR::WIDTH*DR::HEIGHT);
-//     backward(loss);
-//     cout << "loss is " << loss << ", gradient is " << gradient(scene.lightColor) << endl;
-//     loss = 0.0;
-//     return 0;
-// }

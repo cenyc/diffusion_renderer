@@ -5,7 +5,6 @@ include(CTest)
 enable_testing()
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-
 find_package(OpenMP REQUIRED)
 if (OPENMP_FOUND)
     set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
@@ -13,8 +12,9 @@ if (OPENMP_FOUND)
 endif()
 
 include_directories(/home/cenyc/Library/enoki/include)
-
+include_directories(/home/cenyc/Library/enoki-thread/include)
 link_directories(/home/cenyc/Library/enoki/build)
+link_directories(/home/cenyc/Library/enoki-thread/build)
 # link_directories(/home/cenyc/Library/enoki/build/enoki)
 
 # link_libraries加在add_executable之前
@@ -26,8 +26,9 @@ add_library(self_define ${SOURCE_FILES})
 add_executable(diffusion_renderer main.cpp)
 
 # target_link_libraries加在add_executable之后
-target_link_libraries(diffusion_renderer -lenoki-cuda -lenoki-autodiff -lcuda -lcudart)
+target_link_libraries(diffusion_renderer -lenoki-cuda -lenoki-autodiff -lcuda -lcudart -lenoki-thread)
 target_link_libraries(diffusion_renderer self_define)
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
+# set(CMAKE_CXX_FLAGS_RELEASE "$ENV{CXXFLAGS} -O3 -Wall")
 include(CPack)
