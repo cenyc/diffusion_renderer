@@ -1,4 +1,5 @@
 #include "Scene.h"
+#include "Shape.cpp"
 #include "include/svpng.inc"
 
 float Scene::attenuation(float dist) {

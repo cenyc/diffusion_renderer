@@ -1,4 +1,6 @@
 #include "Utils.h"
+#include "Shape.h"
+#include "Shape.cpp"
 int msgCount = 1;
 void Utils::readOFF(string path, Shape<DR::F3X, DR::S3X>& shape) {
     Utils::msg("Start reading off file.");
@@ -77,7 +79,7 @@ template<typename dtype> dtype** Utils::newArray2D(int n, int m) {
     return arr;
 }
 
-bool Utils::readId0(string path, DR::ID0 &id0) {
+bool Utils::readId0(string path, DR::Density &id0) {
     Utils::msg("Start reading Id0 file.");
     
     ifstream infile;

@@ -67,7 +67,11 @@ using RayBuff = Array<ImgBuff, 3>;
 using ImgBuff3 = Array<ImgBuff, 3>;
 using DiffArrayf3 = Array<DF, 3>;
 using ID0 = Array<Array<Packet<float, ID_WIDTH>, ID_HEIGHT>, ID_WIDTH>;
+
 using ID1 = Array<Array<Packet<Point, ID_WIDTH>, ID_HEIGHT>, ID_WIDTH>;
+
+using Density = Array<Array<Packet<float, ID_WIDTH>, ID_HEIGHT>, ID_WIDTH>;
+//using IdGrid = Array<Array<Packet<Point, ID_WIDTH>, ID_HEIGHT>, ID_WIDTH>;
 
 template <typename Value_, size_t Size_>
 struct VectorX : StaticArrayImpl<Value_, Size_, false,
